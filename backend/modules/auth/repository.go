@@ -13,6 +13,8 @@ type Repository interface {
 	UpdateUser(id uuid.UUID, user *models.User) error
 	FindAll() ([]models.User, error)
 	FindSingle(uuid.UUID) (*models.User, error)
+	FindByPhone(phone string) (*models.User, error)
+	FindByUsername(username string) (*models.User, error)
 }
 
 type repository struct {
@@ -52,6 +54,20 @@ func (r *repository) FindSingle(id uuid.UUID) (*models.User, error) {
 func (r *repository) UpdateUser(id uuid.UUID, user *models.User) error {
 	err := r.db.Where(&models.User{ID: id}).Updates(user).Error
 	return translateUniques(err)
+}
+
+// FindByPhone implements [Repository].
+func (r *repository) FindByPhone(phone string) (*models.User, error) {
+	user := &models.User{}
+	err := r.db.Where(&models.User{Phone: phone}).First(user).Error
+	return user, err
+}
+
+// FindByUsername implements [Repository].
+func (r *repository) FindByUsername(username string) (*models.User, error) {
+	user := &models.User{}
+	err := r.db.Where(&models.User{Username: &username}).First(user).Error
+	return user, err
 }
 
 func translateUniques(err error) error {

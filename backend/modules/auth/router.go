@@ -13,6 +13,7 @@ func InitiateRoutes(router *gin.RouterGroup) {
 	service := NewService(repository)
 	controller := NewController(service)
 
-	api.POST("/register", controller.CreateUser)
+	api.POST("/register", controller.Register)
+	api.POST("/login", controller.Login)
 	api.GET("/users", controller.GetAllUsers)
 }

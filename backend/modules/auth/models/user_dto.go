@@ -1,9 +1,11 @@
 package models
 
+import "github.com/google/uuid"
+
 type UserDto struct {
-	ID          string  `json:"id"`
-	Phone       string  `json:"phone" binding:"required"`
-	Username    *string `json:"username"`
-	DisplayName string  `json:"display_name" binding:"required"`
-	CreatedAt   string  `json:"created_at"`
+	ID          uuid.UUID `json:"id"`
+	Phone       string    `json:"phone"`
+	Username    *string   `json:"username"`
+	DisplayName string    `json:"display_name"`
+	CreatedAt   string    `json:"created_at"`
 }

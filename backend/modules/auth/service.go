@@ -2,16 +2,18 @@ package auth
 
 import (
 	"log"
+	"silance/helper"
 	"silance/modules/auth/models"
 
 	"github.com/google/uuid"
 )
 
 type Service interface {
-	CreateUser(*models.UserDto) error
+	CreateUser(*models.RegisterDto) (*models.UserDto, error)
 	UpdateUser(id uuid.UUID, input *models.UserDto) error
 	FindAll() ([]models.UserDto, error)
 	FindSingle(uuid.UUID) (*models.UserDto, error)
+	Login(input models.LoginDto, password string) (bool, *models.UserDto)
 }
 
 type service struct {
@@ -23,27 +25,27 @@ func NewService(repo Repository) Service {
 }
 
 // CreateUser implements [Service].
-func (s *service) CreateUser(input *models.UserDto) error {
+func (s *service) CreateUser(input *models.RegisterDto) (*models.UserDto, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		log.Printf("Failed to generate UUID: %s\n", err)
-		return err
+		return &models.UserDto{}, err
 	}
 
 	user := &models.User{
 		ID:          id,
 		Phone:       input.Phone,
 		Username:    input.Username,
+		Password:    input.Password,
 		DisplayName: input.DisplayName,
 	}
 
 	if err := s.repo.CreateUser(user); err != nil {
 		log.Printf("Failed to create user: %s\n", err)
-		return err
+		return &models.UserDto{}, err
 	}
 
-	*input = *user.ToResponseDto()
-	return err
+	return user.ToResponseDto(), err
 }
 
 // FindAll implements [Service].
@@ -78,4 +80,35 @@ func (s *service) UpdateUser(id uuid.UUID, input *models.UserDto) error {
 
 	*input = *user.ToResponseDto()
 	return err
+}
+
+func (s *service) Login(input models.LoginDto, password string) (bool, *models.UserDto) {
+	var user models.User
+	exists := false
+
+	if input.Phone != nil {
+		model, err := s.repo.FindByPhone(*input.Phone)
+		if err == nil {
+			user = *model
+			exists = true
+		}
+	}
+	if input.Username != nil {
+		model, err := s.repo.FindByUsername(*input.Username)
+		if err == nil {
+			user = *model
+			exists = true
+		}
+	}
+
+	log.Println("===========================================================")
+	log.Println(user.Password)
+	log.Println(password)
+	log.Println(helper.ComparePassword(user.Password, password))
+	log.Println("===========================================================")
+
+	if !exists {
+		return false, &models.UserDto{}
+	}
+	return helper.ComparePassword(user.Password, password), user.ToResponseDto()
 }
