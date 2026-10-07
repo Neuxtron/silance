@@ -71,7 +71,7 @@ func (r *repository) FindByUsername(username string) (*models.User, error) {
 }
 
 func translateUniques(err error) error {
-	// TODO: use gorm.ErrDuplicatedKey and move to contorller
+	// OPTIMIZE: use gorm.ErrDuplicatedKey and move to contorller
 	if err != nil {
 		err = helper.TranslateUniqueError(err, map[string]string{
 			"idx_users_phone":    "Phone number is already registered",

@@ -10,8 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
-const UserIdKey = "user_id"
-const PhoneKey = "phone"
+const userIdKey = "user_id"
+const phoneKey = "phone"
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -31,15 +31,15 @@ func AuthMiddleware() gin.HandlerFunc {
 			common.NewResponse(ctx, 401, "Your session is expired, please login again", nil)
 			return
 		}
-		ctx.Set(UserIdKey, claims.UserID)
-		ctx.Set(PhoneKey, claims.Phone)
+		ctx.Set(userIdKey, claims.UserID)
+		ctx.Set(phoneKey, claims.Phone)
 
 		ctx.Next()
 	}
 }
 
 func CurrentUser(ctx *gin.Context) (userId uuid.UUID, phone string) {
-	userId = ctx.MustGet(UserIdKey).(uuid.UUID)
-	phone = ctx.MustGet(PhoneKey).(string)
+	userId = ctx.MustGet(userIdKey).(uuid.UUID)
+	phone = ctx.MustGet(phoneKey).(string)
 	return
 }

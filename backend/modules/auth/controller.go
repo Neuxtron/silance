@@ -4,6 +4,7 @@ import (
 	"log"
 	"silance/common"
 	"silance/helper"
+	"silance/middlewares"
 	"silance/modules/auth/models"
 
 	"github.com/gin-gonic/gin"
@@ -82,5 +83,12 @@ func (c *Controller) GetAllUsers(ctx *gin.Context) {
 }
 
 func (c *Controller) GetProfile(ctx *gin.Context) {
+	id, _ := middlewares.CurrentUser(ctx)
+	user, err := c.service.FindSingle(id)
+	if err != nil {
+		common.NewInternalServerErrorResponse(ctx, nil)
+		return
+	}
 
+	common.NewResponse(ctx, 200, "Successfully got profile", user)
 }
