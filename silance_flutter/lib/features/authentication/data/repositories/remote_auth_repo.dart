@@ -20,8 +20,8 @@ class const RemoteAuthRepo(final ApiClient api) implements AuthRepo {
       },
     );
 
-    final data = response.data!['data'];
     if (response.data == null) return null;
+    final data = response.data!['data'];
     return AppUser.fromJson(data['user']);
   }
 
@@ -31,8 +31,19 @@ class const RemoteAuthRepo(final ApiClient api) implements AuthRepo {
     String username,
     String displayName,
     String password,
-  ) {
-    // TODO: implement register
-    throw UnimplementedError();
+  ) async {
+    final response = await api.post(
+      '/auth/register',
+      data: {
+        'phone': phone,
+        'username': username,
+        'display_name': displayName,
+        'password': password,
+      },
+    );
+
+    if (response.data == null) return null;
+    final data = response.data!['data'];
+    return AppUser.fromJson(data['user']);
   }
 }

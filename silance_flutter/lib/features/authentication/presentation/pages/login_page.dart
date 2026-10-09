@@ -58,7 +58,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 36),
               BlocSelector<LoginCubit, LoginState, bool>(
-                selector: (state) => state.status == SubmitStatus.loading,
+                selector: (state) => state.status == .loading,
                 builder: (context, loading) {
                   return SizedBox(
                     width: .infinity,

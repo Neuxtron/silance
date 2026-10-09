@@ -4,6 +4,7 @@ import 'package:silance/core/network/api_client.dart';
 import 'package:silance/core/router/app_routes.dart';
 import 'package:silance/features/authentication/data/repositories/remote_auth_repo.dart';
 import 'package:silance/features/authentication/presentation/cubit/login_cubit.dart';
+import 'package:silance/features/authentication/presentation/cubit/register_cubit.dart';
 import 'package:silance/features/authentication/presentation/pages/login_page.dart';
 import 'package:silance/features/authentication/presentation/pages/register_page.dart';
 
@@ -28,7 +29,14 @@ class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.register,
-        builder: (context, state) => const RegisterPage(),
+        builder: (context, state) {
+          final api = ApiClient();
+          final repo = RemoteAuthRepo(api);
+          return BlocProvider(
+            create: (context) => RegisterCubit(repo),
+            child: const RegisterPage(),
+          );
+        },
       ),
     ],
   );
