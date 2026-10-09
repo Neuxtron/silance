@@ -2,6 +2,6 @@ class AppRoutes {
   const AppRoutes._();
 
   //-----------/ Authentication /-----------//
-  static const login = '/login';
-  static const register = '/register';
+  static const String login = '/login';
+  static const String register = '/register';
 }
