@@ -2,11 +2,7 @@ import 'package:silance/core/network/api_client.dart';
 import 'package:silance/features/authentication/domain/entities/app_user.dart';
 import 'package:silance/features/authentication/domain/repositories/auth_repo.dart';
 
-class RemoteAuthRepo implements AuthRepo {
-  new(this.api);
-
-  final ApiClient api;
-
+class const RemoteAuthRepo(final ApiClient api) implements AuthRepo {
   @override
   Future<AppUser?> getProfile() {
     // TODO: implement getProfile

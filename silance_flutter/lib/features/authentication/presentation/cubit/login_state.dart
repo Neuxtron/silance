@@ -1,18 +1,11 @@
 enum SubmitStatus { initial, loading, success, error }
 
-class LoginState {
-  final String username;
-  final String password;
-  final String? errorMessage;
-  final SubmitStatus status;
-
-  new({
-    this.username = '',
-    this.password = '',
-    this.errorMessage,
-    this.status = SubmitStatus.initial,
-  });
-
+class LoginState({
+  final String username = '',
+  final String password = '',
+  final String? errorMessage,
+  final SubmitStatus status = .initial,
+}) {
   LoginState copyWith({
     String? username,
     String? password,

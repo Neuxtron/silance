@@ -1,16 +1,9 @@
-class AppUser {
-  final String id;
-  final String? phone;
-  final String? username;
-  final String displayName;
-
-  new({
-    required this.id,
-    required this.phone,
-    required this.username,
-    required this.displayName,
-  });
-
+class AppUser({
+  required final String id,
+  required final String? phone,
+  required final String? username,
+  required final String displayName,
+}) {
   Map<String, dynamic> toJson() {
     return {
       'id': id,

@@ -3,10 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:silance/features/authentication/domain/repositories/auth_repo.dart';
 import 'package:silance/features/authentication/presentation/cubit/login_state.dart';
 
-class LoginCubit extends Cubit<LoginState> {
-  new(this.repo) : super(LoginState());
-
-  final AuthRepo repo;
+class LoginCubit(final AuthRepo repo) extends Cubit<LoginState> {
+  this : super(LoginState());
 
   void usernameChanged(String value) {
     emit(state.copyWith(username: value));
