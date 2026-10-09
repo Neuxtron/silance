@@ -16,6 +16,7 @@ class SilanceApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Silance',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(),
       routerConfig: AppRouter.router,
     );
   }

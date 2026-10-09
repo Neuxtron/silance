@@ -64,10 +64,6 @@ class LoginPage extends StatelessWidget {
                     width: .infinity,
                     child: ElevatedButton(
                       onPressed: loading ? null : () => cubit.submit(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
                       child: const Text('Login'),
                     ),
                   );
