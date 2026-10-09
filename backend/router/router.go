@@ -4,11 +4,13 @@ import (
 	"silance/helper"
 	"silance/modules/auth"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func Initialize() {
 	router := gin.Default()
+	router.Use(cors.Default())
 	api := router.Group(helper.GetEnv("API_VERSION"))
 
 	auth.InitiateRoutes(api)

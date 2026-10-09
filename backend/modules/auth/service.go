@@ -101,12 +101,6 @@ func (s *service) Login(input models.LoginDto, password string) (bool, *models.U
 		}
 	}
 
-	log.Println("===========================================================")
-	log.Println(user.Password)
-	log.Println(password)
-	log.Println(helper.ComparePassword(user.Password, password))
-	log.Println("===========================================================")
-
 	if !exists {
 		return false, &models.UserDto{}
 	}
