@@ -5,13 +5,11 @@ import 'package:silance/features/authentication/presentation/cubit/login_state.d
 class LoginCubit(final AuthRepo repo) extends Cubit<LoginState> {
   this : super(LoginState());
 
-  void usernameChanged(String value) {
-    emit(state.copyWith(username: value));
-  }
+  String _username = '';
+  String _password = '';
 
-  void passwordChanged(String value) {
-    emit(state.copyWith(password: value));
-  }
+  void usernameChanged(String value) => _username = value;
+  void passwordChanged(String value) => _password = value;
 
   Future<void> submit() async {
     final error = _validate();
@@ -19,7 +17,7 @@ class LoginCubit(final AuthRepo repo) extends Cubit<LoginState> {
     if (error != null) return;
 
     emit(state.copyWith(status: .loading));
-    final result = await repo.login(state.username, state.password);
+    final result = await repo.login(_username, _password);
 
     result.fold(
       (failure) {
@@ -35,10 +33,10 @@ class LoginCubit(final AuthRepo repo) extends Cubit<LoginState> {
   }
 
   String? _validate() {
-    if (state.username.isEmpty) {
+    if (_username.isEmpty) {
       return 'Please enter either your username or phone number';
     }
-    if (state.password.isEmpty) return 'Please enter your password';
+    if (_password.isEmpty) return 'Please enter your password';
     return null;
   }
 }

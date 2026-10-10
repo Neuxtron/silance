@@ -5,11 +5,17 @@ import 'package:silance/features/authentication/presentation/cubit/register_stat
 class RegisterCubit(final AuthRepo repo) extends Cubit<RegisterState> {
   this : super(RegisterState());
 
-  void nameChanged(String value) => state.name = value;
-  void phoneChanged(String value) => state.phone = value;
-  void usernameChanged(String value) => state.username = value;
-  void passwordChanged(String value) => state.password = value;
-  void confirmPasswordChanged(String value) => state.confirmPassword = value;
+  String _name = '';
+  String _phone = '';
+  String _username = '';
+  String _password = '';
+  String _confirmPassword = '';
+
+  void nameChanged(String value) => _name = value;
+  void phoneChanged(String value) => _phone = value;
+  void usernameChanged(String value) => _username = value;
+  void passwordChanged(String value) => _password = value;
+  void confirmPasswordChanged(String value) => _confirmPassword = value;
 
   Future<void> submit() async {
     final error = _validate();
@@ -18,10 +24,10 @@ class RegisterCubit(final AuthRepo repo) extends Cubit<RegisterState> {
 
     emit(state.copyWith(status: .loading));
     final result = await repo.register(
-      phone: state.phone,
-      username: state.username,
-      displayName: state.name,
-      password: state.password,
+      phone: _phone,
+      username: _username,
+      displayName: _name,
+      password: _password,
     );
 
     result.fold(
@@ -38,12 +44,12 @@ class RegisterCubit(final AuthRepo repo) extends Cubit<RegisterState> {
   }
 
   String? _validate() {
-    if (state.name.isEmpty) return 'Please enter your name';
-    if (state.phone.isEmpty) return 'Please enter your phone number';
-    if (state.password.length < 8) {
+    if (_name.isEmpty) return 'Please enter your name';
+    if (_phone.isEmpty) return 'Please enter your phone number';
+    if (_password.length < 8) {
       return 'Password must be at least 8 characters';
     }
-    if (state.password != state.confirmPassword) return 'Passwords must match';
+    if (_password != _confirmPassword) return 'Passwords must match';
 
     return null;
   }
