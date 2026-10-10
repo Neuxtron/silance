@@ -32,7 +32,7 @@ class ApiClient {
     );
   }
 
-  Future<Response<Map<String, dynamic>>> get(
+  Future<Map<String, dynamic>?> get(
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
@@ -42,10 +42,10 @@ class ApiClient {
       queryParameters: queryParameters,
       options: options,
     );
-    return response;
+    return response.data;
   }
 
-  Future<Response<Map<String, dynamic>>> post(
+  Future<Map<String, dynamic>?> post(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -57,10 +57,10 @@ class ApiClient {
       queryParameters: queryParameters,
       options: options,
     );
-    return response;
+    return response.data;
   }
 
-  Future<Response<Map<String, dynamic>>> put(
+  Future<Map<String, dynamic>?> put(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -72,10 +72,10 @@ class ApiClient {
       queryParameters: queryParameters,
       options: options,
     );
-    return response;
+    return response.data;
   }
 
-  Future<Response<Map<String, dynamic>>> delete(
+  Future<Map<String, dynamic>?> delete(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -87,6 +87,6 @@ class ApiClient {
       queryParameters: queryParameters,
       options: options,
     );
-    return response;
+    return response.data;
   }
 }

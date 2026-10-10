@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:silance/features/authentication/domain/repositories/auth_repo.dart';
 import 'package:silance/features/authentication/presentation/cubit/register_state.dart';
@@ -15,30 +14,27 @@ class RegisterCubit(final AuthRepo repo) extends Cubit<RegisterState> {
   Future<void> submit() async {
     final error = _validate();
     emit(state.copyWith(errorMessage: () => error));
-    if (error != null) {
-      emit(state.copyWith(errorMessage: () => error));
-    }
+    if (error != null) return;
 
     emit(state.copyWith(status: .loading));
-    try {
-      final user = await repo.register(
-        state.phone,
-        state.username,
-        state.name,
-        state.password,
-      );
-      if (user == null) throw Exception('User is null');
-      emit(state.copyWith(status: .success));
-    } catch (e) {
-      String message = 'Something went wrong, please try again';
-      if (e is DioException) message = e.message ?? message;
-      emit(
-        state.copyWith(
-          status: .error,
-          errorMessage: () => message,
-        ),
-      );
-    }
+    final result = await repo.register(
+      phone: state.phone,
+      username: state.username,
+      displayName: state.name,
+      password: state.password,
+    );
+
+    result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: .error,
+            errorMessage: () => failure.message,
+          ),
+        );
+      },
+      (user) => emit(state.copyWith(status: .success)),
+    );
   }
 
   String? _validate() {

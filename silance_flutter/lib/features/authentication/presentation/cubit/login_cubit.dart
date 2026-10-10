@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:silance/features/authentication/domain/repositories/auth_repo.dart';
 import 'package:silance/features/authentication/presentation/cubit/login_state.dart';
@@ -20,20 +19,19 @@ class LoginCubit(final AuthRepo repo) extends Cubit<LoginState> {
     if (error != null) return;
 
     emit(state.copyWith(status: .loading));
-    try {
-      final user = await repo.login(state.username, state.password);
-      if (user == null) throw Exception('User is null');
-      emit(state.copyWith(status: .success));
-    } catch (e) {
-      String message = 'Something went wrong, please try again';
-      if (e is DioException) message = e.message ?? message;
-      emit(
-        state.copyWith(
-          status: .error,
-          errorMessage: () => message,
-        ),
-      );
-    }
+    final result = await repo.login(state.username, state.password);
+
+    result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: .error,
+            errorMessage: () => failure.message,
+          ),
+        );
+      },
+      (user) => emit(state.copyWith(status: .success)),
+    );
   }
 
   String? _validate() {
