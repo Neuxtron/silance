@@ -8,9 +8,25 @@ import 'package:silance/features/authentication/domain/repositories/auth_repo.da
 
 class const RemoteAuthRepo(final ApiClient api) implements AuthRepo {
   @override
-  Future<Either<Failure, AppUser>> getProfile() {
-    // TODO: implement getProfile
-    throw UnimplementedError();
+  Future<Either<Failure, AppUser>> getProfile() async {
+    try {
+      final data = await api.get('/auth/profile');
+      final userJson = data?['data']['user'];
+      if (userJson == null) {
+        final message = data?['message'];
+        return Left(ServerFailure(message));
+      }
+      return Right(AppUser.fromJson(userJson));
+    } on DioException catch (e) {
+      if (e.type == .connectionTimeout) {
+        return const Left(NetworkFailure());
+      }
+      final message = e.response?.data?['message'];
+      return Left(ServerFailure(message));
+    } catch (e) {
+      debugPrint(e.toString());
+      return const Left(AppFailure());
+    }
   }
 
   @override
