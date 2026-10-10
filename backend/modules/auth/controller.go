@@ -39,7 +39,7 @@ func (c *Controller) Register(ctx *gin.Context) {
 	}
 
 	common.NewResponse(ctx, 201, "Successfully created user", map[string]any{
-		"user":  input,
+		"user":  user,
 		"token": token,
 	})
 }

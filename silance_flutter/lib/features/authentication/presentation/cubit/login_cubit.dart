@@ -24,7 +24,7 @@ class LoginCubit(final AuthRepo repo) extends Cubit<LoginState> {
       final user = await repo.login(state.username, state.password);
       if (user == null) throw Exception('User is null');
       emit(state.copyWith(status: .success));
-    } on Exception catch (e) {
+    } catch (e) {
       String message = 'Something went wrong, please try again';
       if (e is DioException) message = e.message ?? message;
       emit(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:silance/features/authentication/presentation/cubit/register_cubit.dart';
 import 'package:silance/features/authentication/presentation/cubit/register_state.dart';
 
@@ -91,7 +92,7 @@ class RegisterPage extends StatelessWidget {
                 children: [
                   const Text('Already have an account?'),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () => context.pop(),
                     child: const Text('Login'),
                   ),
                 ],
