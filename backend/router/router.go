@@ -3,6 +3,7 @@ package router
 import (
 	"silance/helper"
 	"silance/modules/auth"
+	"silance/modules/users"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -24,6 +25,7 @@ func Initialize() {
 	api := router.Group(helper.GetEnv("API_VERSION"))
 
 	auth.InitiateRoutes(api)
+	users.InitiateRoutes(api)
 
 	router.Run(helper.GetEnv("APP_PORT"))
 }

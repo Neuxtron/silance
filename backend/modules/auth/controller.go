@@ -73,15 +73,6 @@ func (c *Controller) UpdateProfile(ctx *gin.Context) {
 
 }
 
-func (c *Controller) GetAllUsers(ctx *gin.Context) {
-	users, err := c.service.FindAll()
-	if err != nil {
-		common.NewInternalServerErrorResponse(ctx, nil)
-		return
-	}
-	common.NewResponse(ctx, 200, "Successfully got all users", users)
-}
-
 func (c *Controller) GetProfile(ctx *gin.Context) {
 	id, _ := middlewares.CurrentUser(ctx)
 	user, err := c.service.FindSingle(id)

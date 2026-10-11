@@ -1,10 +1,10 @@
 package database
 
-import auth "silance/modules/auth/models"
+import users "silance/modules/users/models"
 
 func InitiateMigration() {
 	err := DBConnection.AutoMigrate(
-		&auth.User{},
+		&users.User{},
 	)
 
 	if err != nil {

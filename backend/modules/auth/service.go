@@ -4,16 +4,16 @@ import (
 	"log"
 	"silance/helper"
 	"silance/modules/auth/models"
+	userModels "silance/modules/users/models"
 
 	"github.com/google/uuid"
 )
 
 type Service interface {
-	CreateUser(*models.RegisterDto) (*models.UserDto, error)
-	UpdateUser(id uuid.UUID, input *models.UserDto) error
-	FindAll() ([]models.UserDto, error)
-	FindSingle(uuid.UUID) (*models.UserDto, error)
-	Login(input models.LoginDto, password string) (bool, *models.UserDto)
+	CreateUser(*models.RegisterDto) (*userModels.UserDto, error)
+	UpdateUser(id uuid.UUID, input *userModels.UserDto) error
+	FindSingle(uuid.UUID) (*userModels.UserDto, error)
+	Login(input models.LoginDto, password string) (bool, *userModels.UserDto)
 }
 
 type service struct {
@@ -25,14 +25,14 @@ func NewService(repo Repository) Service {
 }
 
 // CreateUser implements [Service].
-func (s *service) CreateUser(input *models.RegisterDto) (*models.UserDto, error) {
+func (s *service) CreateUser(input *models.RegisterDto) (*userModels.UserDto, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		log.Printf("Failed to generate UUID: %s\n", err)
-		return &models.UserDto{}, err
+		return &userModels.UserDto{}, err
 	}
 
-	user := &models.User{
+	user := &userModels.User{
 		ID:          id,
 		Phone:       input.Phone,
 		Username:    input.Username,
@@ -42,36 +42,21 @@ func (s *service) CreateUser(input *models.RegisterDto) (*models.UserDto, error)
 
 	if err := s.repo.CreateUser(user); err != nil {
 		log.Printf("Failed to create user: %s\n", err)
-		return &models.UserDto{}, err
+		return &userModels.UserDto{}, err
 	}
 
 	return user.ToResponseDto(), err
 }
 
-// FindAll implements [Service].
-func (s *service) FindAll() ([]models.UserDto, error) {
-	users, err := s.repo.FindAll()
-	if err != nil {
-		log.Printf("Failed to get all users: %s\n", err)
-		return []models.UserDto{}, err
-	}
-
-	usersDto := []models.UserDto{}
-	for _, user := range users {
-		usersDto = append(usersDto, *user.ToResponseDto())
-	}
-	return usersDto, nil
-}
-
 // FindSingle implements [Service].
-func (s *service) FindSingle(id uuid.UUID) (*models.UserDto, error) {
+func (s *service) FindSingle(id uuid.UUID) (*userModels.UserDto, error) {
 	user, err := s.repo.FindSingle(id)
 	return user.ToResponseDto(), err
 }
 
 // UpdateUser implements [Service].
-func (s *service) UpdateUser(id uuid.UUID, input *models.UserDto) error {
-	user := &models.User{
+func (s *service) UpdateUser(id uuid.UUID, input *userModels.UserDto) error {
+	user := &userModels.User{
 		Phone:       input.Phone,
 		Username:    input.Username,
 		DisplayName: input.DisplayName,
@@ -82,8 +67,8 @@ func (s *service) UpdateUser(id uuid.UUID, input *models.UserDto) error {
 	return err
 }
 
-func (s *service) Login(input models.LoginDto, password string) (bool, *models.UserDto) {
-	var user models.User
+func (s *service) Login(input models.LoginDto, password string) (bool, *userModels.UserDto) {
+	var user userModels.User
 	exists := false
 
 	if input.Phone != nil {
@@ -102,7 +87,7 @@ func (s *service) Login(input models.LoginDto, password string) (bool, *models.U
 	}
 
 	if !exists {
-		return false, &models.UserDto{}
+		return false, &userModels.UserDto{}
 	}
 	return helper.ComparePassword(user.Password, password), user.ToResponseDto()
 }
