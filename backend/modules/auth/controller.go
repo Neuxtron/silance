@@ -24,7 +24,14 @@ func (c *Controller) Register(ctx *gin.Context) {
 		common.NewResponse(ctx, 400, err.Error(), nil)
 		return
 	}
+
 	user, err := c.service.CreateAccount(&input)
+	hasDuplicate := translateUniques(&err)
+	if hasDuplicate {
+		common.NewResponse(ctx, 409, err.Error(), nil)
+		return
+	}
+
 	if err != nil {
 		log.Printf("Failed to create user: %s\n", err)
 		common.NewInternalServerErrorResponse(ctx, nil)
@@ -82,4 +89,16 @@ func (c *Controller) GetProfile(ctx *gin.Context) {
 	}
 
 	common.NewResponse(ctx, 200, "Successfully got profile", user)
+}
+
+func translateUniques(err *error) bool {
+	if err != nil {
+		var isUniqueViolation bool
+		isUniqueViolation, *err = helper.TranslateUniqueError(*err, map[string]string{
+			"idx_users_phone":    "Phone number is already registered",
+			"idx_users_username": "This username is already used",
+		})
+		return isUniqueViolation
+	}
+	return false
 }

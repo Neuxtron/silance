@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"silance/helper"
 	userModels "silance/modules/users/models"
 
 	"github.com/google/uuid"
@@ -27,7 +26,7 @@ func NewRepository(db *gorm.DB) Repository {
 // CreateUser implements [Repository].
 func (r *repository) CreateUser(user *userModels.User) error {
 	err := r.db.Create(user).Error
-	return translateUniques(err)
+	return err
 }
 
 // FindAll implements [Repository].
@@ -52,7 +51,7 @@ func (r *repository) FindSingle(id uuid.UUID) (*userModels.User, error) {
 // UpdateUser implements [Repository].
 func (r *repository) UpdateUser(id uuid.UUID, user *userModels.User) error {
 	err := r.db.Where(&userModels.User{ID: id}).Updates(user).Error
-	return translateUniques(err)
+	return err
 }
 
 // FindByPhone implements [Repository].
@@ -67,16 +66,4 @@ func (r *repository) FindByUsername(username string) (*userModels.User, error) {
 	user := &userModels.User{}
 	err := r.db.Where(&userModels.User{Username: &username}).First(user).Error
 	return user, err
-}
-
-func translateUniques(err error) error {
-	// OPTIMIZE: use gorm.ErrDuplicatedKey and move to contorller
-	if err != nil {
-		err = helper.TranslateUniqueError(err, map[string]string{
-			"idx_users_phone":    "Phone number is already registered",
-			"idx_users_username": "This username is already used",
-		})
-		return err
-	}
-	return nil
 }
