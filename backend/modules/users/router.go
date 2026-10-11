@@ -12,7 +12,7 @@ func InitiateRoutes(router *gin.RouterGroup) {
 
 	repo := NewRepository(database.DBConnection)
 	service := NewService(repo)
-	controller := Controller{service}
+	controller := NewController(service)
 
 	api.GET("/", middlewares.AuthMiddleware(), controller.GetAllUsers)
 }
