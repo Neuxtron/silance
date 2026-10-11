@@ -24,7 +24,7 @@ func (c *Controller) Register(ctx *gin.Context) {
 		common.NewResponse(ctx, 400, err.Error(), nil)
 		return
 	}
-	user, err := c.service.CreateUser(&input)
+	user, err := c.service.CreateAccount(&input)
 	if err != nil {
 		log.Printf("Failed to create user: %s\n", err)
 		common.NewInternalServerErrorResponse(ctx, nil)
@@ -75,7 +75,7 @@ func (c *Controller) UpdateProfile(ctx *gin.Context) {
 
 func (c *Controller) GetProfile(ctx *gin.Context) {
 	id, _ := middlewares.CurrentUser(ctx)
-	user, err := c.service.FindSingle(id)
+	user, err := c.service.GetProfile(id)
 	if err != nil {
 		common.NewInternalServerErrorResponse(ctx, nil)
 		return

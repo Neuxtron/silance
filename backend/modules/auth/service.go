@@ -10,9 +10,9 @@ import (
 )
 
 type Service interface {
-	CreateUser(*models.RegisterDto) (*userModels.UserDto, error)
-	UpdateUser(id uuid.UUID, input *userModels.UserDto) error
-	FindSingle(uuid.UUID) (*userModels.UserDto, error)
+	CreateAccount(*models.RegisterDto) (*userModels.UserDto, error)
+	UpdateProfile(id uuid.UUID, input *userModels.UserDto) error
+	GetProfile(uuid.UUID) (*userModels.UserDto, error)
 	Login(input models.LoginDto, password string) (bool, *userModels.UserDto)
 }
 
@@ -24,8 +24,8 @@ func NewService(repo Repository) Service {
 	return &service{repo}
 }
 
-// CreateUser implements [Service].
-func (s *service) CreateUser(input *models.RegisterDto) (*userModels.UserDto, error) {
+// CreateAccount implements [Service].
+func (s *service) CreateAccount(input *models.RegisterDto) (*userModels.UserDto, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		log.Printf("Failed to generate UUID: %s\n", err)
@@ -48,14 +48,14 @@ func (s *service) CreateUser(input *models.RegisterDto) (*userModels.UserDto, er
 	return user.ToResponseDto(), err
 }
 
-// FindSingle implements [Service].
-func (s *service) FindSingle(id uuid.UUID) (*userModels.UserDto, error) {
+// GetProfile implements [Service].
+func (s *service) GetProfile(id uuid.UUID) (*userModels.UserDto, error) {
 	user, err := s.repo.FindSingle(id)
 	return user.ToResponseDto(), err
 }
 
-// UpdateUser implements [Service].
-func (s *service) UpdateUser(id uuid.UUID, input *userModels.UserDto) error {
+// UpdateProfile implements [Service].
+func (s *service) UpdateProfile(id uuid.UUID, input *userModels.UserDto) error {
 	user := &userModels.User{
 		Phone:       input.Phone,
 		Username:    input.Username,
@@ -67,6 +67,7 @@ func (s *service) UpdateUser(id uuid.UUID, input *userModels.UserDto) error {
 	return err
 }
 
+// Login implements [Service].
 func (s *service) Login(input models.LoginDto, password string) (bool, *userModels.UserDto) {
 	var user userModels.User
 	exists := false
