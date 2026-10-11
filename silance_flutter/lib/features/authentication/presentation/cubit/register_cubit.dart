@@ -39,7 +39,7 @@ class RegisterCubit(final AuthRepo repo) extends Cubit<RegisterState> {
           ),
         );
       },
-      (user) => emit(state.copyWith(status: .success)),
+      (user) => emit(state.copyWith(status: .success, user: user)),
     );
   }
 

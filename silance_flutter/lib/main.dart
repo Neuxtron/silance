@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:silance/core/di/injection_container.dart';
 import 'package:silance/core/router/app_router.dart';
+import 'package:silance/features/authentication/presentation/cubit/auth_cubit.dart';
 
 void main() async {
   // Environment
@@ -19,11 +21,14 @@ class SilanceApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Silance',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      routerConfig: AppRouter.router,
+    return BlocProvider.value(
+      value: getIt<AuthCubit>()..authenticate(),
+      child: MaterialApp.router(
+        title: 'Silance',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark(),
+        routerConfig: AppRouter.router,
+      ),
     );
   }
 }

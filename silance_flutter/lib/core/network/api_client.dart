@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:silance/core/utils/constants.dart';
 
 class ApiClient {
   late final Dio _dio;
@@ -30,6 +32,24 @@ class ApiClient {
         },
       ),
     );
+  }
+
+  Future<bool> checkToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(AppConstants.tokenKey);
+    if (token == null) return false;
+    _dio.options.headers['Authorization'] = 'Bearer $token';
+    return true;
+  }
+
+  Future<void> setToken(String? token) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (token != null) {
+      prefs.setString(AppConstants.tokenKey, token);
+    } else {
+      prefs.remove(AppConstants.tokenKey);
+    }
+    _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 
   Future<Map<String, dynamic>?> get(

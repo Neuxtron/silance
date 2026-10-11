@@ -28,7 +28,9 @@ class LoginCubit(final AuthRepo repo) extends Cubit<LoginState> {
           ),
         );
       },
-      (user) => emit(state.copyWith(status: .success)),
+      (user) {
+        emit(state.copyWith(status: .success, user: user));
+      },
     );
   }
 
