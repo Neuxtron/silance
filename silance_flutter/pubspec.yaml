@@ -41,6 +41,7 @@ dependencies:
   get_it: ^9.3.0
   dartz: ^0.10.1
   shared_preferences: ^2.5.6
+  flutter_slidable: ^4.0.3
 
 dev_dependencies:
   flutter_test:
