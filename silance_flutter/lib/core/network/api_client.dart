@@ -1,19 +1,21 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:silance/core/network/interceptors.dart';
 import 'package:silance/core/utils/constants.dart';
 
-class ApiClient {
-  late final Dio _dio;
+class ApiClient([Dio? dio]) {
+  this : _dio = dio ?? _createDio();
 
-  new() {
+  final Dio _dio;
+
+  static Dio _createDio() {
     final baseUrl = dotenv.env['BASE_URL'];
     if (baseUrl == null) {
       throw EmptyEnvFileError();
     }
 
-    _dio = Dio(
+    return Dio(
       BaseOptions(
         baseUrl: baseUrl,
         headers: {
@@ -21,17 +23,7 @@ class ApiClient {
           'Accept': 'application/json',
         },
       ),
-    );
-
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onError: (error, handler) {
-          final message = error.response?.data['message'];
-          debugPrint(error.response?.data.toString());
-          return handler.next(error.copyWith(message: message));
-        },
-      ),
-    );
+    )..interceptors.add(ErrorMessageInterceptor());
   }
 
   Future<bool> checkToken() async {
