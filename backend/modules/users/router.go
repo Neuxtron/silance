@@ -14,5 +14,5 @@ func InitiateRoutes(router *gin.RouterGroup) {
 	service := NewService(repo)
 	controller := NewController(service)
 
-	api.GET("/", middlewares.AuthMiddleware(), controller.GetAllUsers)
+	api.GET("", middlewares.AuthMiddleware(), controller.GetAllUsers)
 }

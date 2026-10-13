@@ -1,6 +1,6 @@
 class AppUser({
   required final String id,
-  required final String? phone,
+  required final String phone,
   required final String? username,
   required final String displayName,
 }) {

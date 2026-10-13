@@ -11,6 +11,7 @@ import 'package:silance/features/authentication/presentation/cubit/register_cubi
 import 'package:silance/features/authentication/presentation/pages/login_page.dart';
 import 'package:silance/features/authentication/presentation/pages/register_page.dart';
 import 'package:silance/features/calls/presentation/pages/calls_page.dart';
+import 'package:silance/features/home/presentation/cubit/home_cubit.dart';
 import 'package:silance/features/home/presentation/pages/home_page.dart';
 import 'package:silance/features/home/presentation/pages/splash_screen.dart';
 
@@ -80,7 +81,12 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRoutes.home,
-                builder: (context, state) => const HomePage(),
+                builder: (context, state) {
+                  return BlocProvider(
+                    create: (context) => getIt<HomeCubit>()..getUsers(),
+                    child: const HomePage(),
+                  );
+                },
               ),
             ],
           ),

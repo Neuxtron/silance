@@ -5,6 +5,9 @@ import 'package:silance/features/authentication/domain/repositories/auth_repo.da
 import 'package:silance/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:silance/features/authentication/presentation/cubit/login_cubit.dart';
 import 'package:silance/features/authentication/presentation/cubit/register_cubit.dart';
+import 'package:silance/features/home/data/remote_home_repo.dart';
+import 'package:silance/features/home/domain/repositories/home_repo.dart';
+import 'package:silance/features/home/presentation/cubit/home_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -17,4 +20,6 @@ void setupLocator() {
   getIt.registerLazySingleton(() => AuthCubit(getIt()));
   getIt.registerFactory(() => LoginCubit(getIt()));
   getIt.registerFactory(() => RegisterCubit(getIt()));
+  getIt.registerFactory<HomeRepo>(() => RemoteHomeRepo(getIt()));
+  getIt.registerFactory(() => HomeCubit(getIt()));
 }

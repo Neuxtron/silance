@@ -46,10 +46,11 @@ class ApiClient {
     final prefs = await SharedPreferences.getInstance();
     if (token != null) {
       prefs.setString(AppConstants.tokenKey, token);
+      _dio.options.headers['Authorization'] = 'Bearer $token';
     } else {
       prefs.remove(AppConstants.tokenKey);
+      _dio.options.headers.remove('Authorization');
     }
-    _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 
   Future<Map<String, dynamic>?> get(
