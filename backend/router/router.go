@@ -3,6 +3,7 @@ package router
 import (
 	"silance/helper"
 	"silance/modules/auth"
+	"silance/modules/messages"
 	"silance/modules/users"
 	"time"
 
@@ -26,6 +27,7 @@ func Initialize() {
 
 	auth.InitiateRoutes(api)
 	users.InitiateRoutes(api)
+	messages.InitiateRoutes(api)
 
 	router.Run(helper.GetEnv("APP_PORT"))
 }
