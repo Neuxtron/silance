@@ -1,39 +1,16 @@
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/widgets.dart';
 import 'package:silance/core/error/failures.dart';
-import 'package:silance/core/network/api_client.dart';
+import 'package:silance/core/utils/repository_guard.dart';
+import 'package:silance/features/authentication/data/datasources/remote_auth_datasource.dart';
 import 'package:silance/features/authentication/domain/entities/app_user.dart';
 import 'package:silance/features/authentication/domain/repositories/auth_repo.dart';
 
-class const RemoteAuthRepo(final ApiClient api) implements AuthRepo {
+class const RemoteAuthRepo(final RemoteAuthDatasource dataSource)
+    with RepositoryGuard
+    implements AuthRepo {
   @override
   Future<Either<Failure, AppUser>> getProfile() async {
-    try {
-      final hasToken = await api.checkToken();
-      if (!hasToken) return const Left(UnauthorizedFailure());
-      final data = await api.get('/auth/profile');
-      final userJson = data?['data'];
-      if (userJson == null) {
-        final message = data?['message'];
-        return Left(ServerFailure(message));
-      }
-      return Right(AppUser.fromJson(userJson));
-    } on DioException catch (e) {
-      if (e.type == .connectionTimeout) {
-        return const Left(NetworkFailure());
-      }
-
-      if (e.response?.statusCode == 401) {
-        return const Left(UnauthorizedFailure());
-      }
-
-      final message = e.response?.data?['message'] as String?;
-      return Left(ServerFailure(message));
-    } catch (e) {
-      debugPrint(e.toString());
-      return const Left(AppFailure());
-    }
+    return guard(() => dataSource.getProfile());
   }
 
   @override
@@ -41,35 +18,7 @@ class const RemoteAuthRepo(final ApiClient api) implements AuthRepo {
     String username,
     String password,
   ) async {
-    try {
-      final data = await api.post(
-        '/auth/login',
-        data: {
-          'username': username,
-          'phone': username,
-          'password': password,
-        },
-      );
-
-      final userJson = data?['data']['user'];
-      final token = data?['data']['token'];
-      if (userJson == null || token == null) {
-        final message = data?['message'];
-        return Left(ServerFailure(message));
-      }
-
-      api.setToken(token);
-      return Right(AppUser.fromJson(userJson));
-    } on DioException catch (e) {
-      if (e.type == .connectionTimeout) {
-        return const Left(NetworkFailure());
-      }
-      final message = e.response?.data?['message'] as String?;
-      return Left(ServerFailure(message));
-    } catch (e) {
-      debugPrint(e.toString());
-      return const Left(AppFailure());
-    }
+    return guard(() => dataSource.login(username, password));
   }
 
   @override
@@ -79,39 +28,11 @@ class const RemoteAuthRepo(final ApiClient api) implements AuthRepo {
     required String displayName,
     required String password,
   }) async {
-    try {
-      final data = await api.post(
-        '/auth/register',
-        data: {
-          'phone': phone,
-          'username': username,
-          'display_name': displayName,
-          'password': password,
-        },
-      );
-
-      final userJson = data?['data']['user'];
-      final token = data?['data']['token'];
-      if (userJson == null) {
-        final message = data?['message'];
-        return Left(ServerFailure(message));
-      }
-      if (token == null) return const Right(null);
-
-      api.setToken(token);
-      return Right(AppUser.fromJson(userJson));
-    } on DioException catch (e) {
-      if (e.type == .connectionTimeout) {
-        return const Left(NetworkFailure());
-      }
-      final message = e.response?.data?['message'] as String?;
-      return Left(ServerFailure(message));
-    } catch (e) {
-      debugPrint(e.toString());
-      return const Left(AppFailure());
-    }
+    return guard(() {
+      return dataSource.register(phone, username, displayName, password);
+    });
   }
 
   @override
-  Future<void> logout() => api.setToken(null);
+  Future<void> logout() => guard(() => dataSource.logout());
 }

@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:silance/core/network/api_client.dart';
+import 'package:silance/features/authentication/data/datasources/remote_auth_datasource.dart';
 import 'package:silance/features/authentication/data/repositories/remote_auth_repo.dart';
 import 'package:silance/features/authentication/domain/repositories/auth_repo.dart';
 import 'package:silance/features/authentication/presentation/cubit/auth_cubit.dart';
@@ -16,6 +17,9 @@ void setupLocator() {
   getIt.registerSingleton(ApiClient());
 
   //-----------/ Authentication /-----------//
+  getIt.registerLazySingleton<RemoteAuthDatasource>(
+    () => RemoteAuthDatasourceImpl(getIt()),
+  );
   getIt.registerLazySingleton<AuthRepo>(() => RemoteAuthRepo(getIt()));
   getIt.registerLazySingleton(() => AuthCubit(getIt()));
   getIt.registerFactory(() => LoginCubit(getIt()));
