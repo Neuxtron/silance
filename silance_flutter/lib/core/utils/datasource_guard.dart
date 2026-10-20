@@ -16,10 +16,10 @@ mixin DatasourceGuard {
         default:
           break;
       }
-      if (e.response?.statusCode == 401) {
-        throw const UnauthorizedException();
-      }
       final message = e.response?.data?['message'] as String?;
+      if (e.response?.statusCode == 401) {
+        throw UnauthorizedException(message: message);
+      }
       throw ServerException(message);
     } catch (e) {
       rethrow;

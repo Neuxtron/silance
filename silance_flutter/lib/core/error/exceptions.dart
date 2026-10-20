@@ -12,20 +12,30 @@ class const ServerException(
 }
 
 class const UnauthorizedException({
-  final String message = 'Failed to authenticate, please login again',
+  String? message,
   final String? code,
   final Object? error,
 }) implements Exception {
+  this : message = message ?? 'Failed to authenticate, please login again';
+
+  final String message;
+
   @override
   String toString() => 'UnauthorizedException: $message';
 }
 
 class const NetworkException({
-  final String message =
-      'Can\'t connect to the server, plaese check your connection',
+  String? message,
   final String? code,
   final Object? error,
 }) implements Exception {
+  this
+    : message =
+          message ??
+          'Can\'t connect to the server, plaese check your connection';
+
+  final String message;
+
   @override
   String toString() => 'NetworkException: $message';
 }
