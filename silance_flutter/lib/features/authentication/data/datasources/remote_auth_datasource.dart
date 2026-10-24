@@ -1,6 +1,6 @@
 import 'package:silance/core/error/exceptions.dart';
 import 'package:silance/core/network/api_client.dart';
-import 'package:silance/core/utils/datasource_guard.dart';
+import 'package:silance/core/utils/remote_datasource_guard.dart';
 import 'package:silance/features/authentication/domain/entities/app_user.dart';
 
 abstract class RemoteAuthDatasource {
@@ -16,7 +16,7 @@ abstract class RemoteAuthDatasource {
 }
 
 class const RemoteAuthDatasourceImpl(final ApiClient api)
-    with DatasourceGuard
+    with RemoteDatasourceGuard
     implements RemoteAuthDatasource {
   @override
   Future<AppUser> getProfile() async {

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:silance/core/error/exceptions.dart';
 
-mixin DatasourceGuard {
+mixin RemoteDatasourceGuard {
   Future<T> guard<T>(Future<T> Function() action) async {
     try {
       return await action();
