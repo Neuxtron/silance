@@ -4,7 +4,7 @@ import 'package:silance/features/authentication/domain/entities/app_user.dart';
 import 'package:silance/features/authentication/domain/repositories/auth_repo.dart';
 import 'package:silance/features/authentication/presentation/cubit/auth_states.dart';
 
-class AuthCubit(final AuthRepo repo) extends Cubit<AuthStates> {
+class AuthCubit(final AuthRepo repo) extends Cubit<AuthState> {
   this : super(const AuthInitial());
 
   AppUser? get user {
