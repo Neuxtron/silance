@@ -14,6 +14,8 @@ import 'package:silance/features/calls/presentation/pages/calls_page.dart';
 import 'package:silance/features/home/presentation/cubit/home_cubit.dart';
 import 'package:silance/features/home/presentation/pages/home_page.dart';
 import 'package:silance/features/home/presentation/pages/splash_screen.dart';
+import 'package:silance/features/messaging/presentation/cubit/messaging_cubit.dart';
+import 'package:silance/features/messaging/presentation/pages/messaging_room_page.dart';
 
 class AppRouter {
   const AppRouter._();
@@ -99,6 +101,22 @@ class AppRouter {
             ],
           ),
         ],
+      ),
+
+      //-----------/ Messaging /-----------//
+      GoRoute(
+        path: '${AppRoutes.messagingRoom}/:targetId',
+        builder: (context, state) {
+          final userId = context.read<AuthCubit>().user!.id;
+          final targetId = state.pathParameters['targetId'];
+          return BlocProvider(
+            create: (context) {
+              return getIt<MessagingCubit>(param1: userId, param2: targetId)
+                ..startMessages();
+            },
+            child: const MessagingRoomPage(),
+          );
+        },
       ),
     ],
   );

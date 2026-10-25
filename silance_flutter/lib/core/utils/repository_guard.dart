@@ -18,4 +18,21 @@ mixin RepositoryGuard {
       return const Left(AppFailure());
     }
   }
+
+  Stream<Either<Failure, T>> streamGuard<T>(
+    Stream<T> Function() action,
+  ) async* {
+    try {
+      yield* action().map((v) => Right(v));
+    } on UnauthorizedException catch (e) {
+      yield Left(UnauthorizedFailure(e.message));
+    } on ServerException catch (e) {
+      yield Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      yield Left(NetworkFailure(e.message));
+    } catch (e) {
+      debugPrint(e.toString());
+      yield const Left(AppFailure());
+    }
+  }
 }

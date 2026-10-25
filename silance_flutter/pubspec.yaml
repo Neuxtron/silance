@@ -44,6 +44,7 @@ dependencies:
   flutter_slidable: ^4.0.3
   mocktail: ^1.0.5
   equatable: ^3.0.0
+  web_socket_channel: ^3.0.3
 
 dev_dependencies:
   flutter_test:

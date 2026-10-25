@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:silance/core/router/app_routes.dart';
 import 'package:silance/features/home/presentation/cubit/home_cubit.dart';
 import 'package:silance/features/home/presentation/cubit/home_states.dart';
 
@@ -58,13 +60,21 @@ class HomePage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final user = users[index];
                 return ListTile(
-                  onTap: () {},
+                  onTap: () {
+                    context.push('${AppRoutes.messagingRoom}/${user.id}');
+                  },
                   leading: const CircleAvatar(
                     backgroundColor: Color(0xFF331B55),
                     child: Icon(Icons.person),
                   ),
                   title: Text(user.displayName),
-                  subtitle: Text(user.username ?? '-'),
+                  subtitle: Text(
+                    user.username ?? 'No username',
+                    style: TextStyle(
+                      color: user.username == null ? Colors.white24 : null,
+                      fontStyle: user.username == null ? .italic : null,
+                    ),
+                  ),
                 );
               },
             ),

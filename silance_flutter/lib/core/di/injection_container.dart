@@ -9,6 +9,10 @@ import 'package:silance/features/authentication/presentation/cubit/register_cubi
 import 'package:silance/features/home/data/remote_home_repo.dart';
 import 'package:silance/features/home/domain/repositories/home_repo.dart';
 import 'package:silance/features/home/presentation/cubit/home_cubit.dart';
+import 'package:silance/features/messaging/data/datasources/socket_messaging_datasource.dart';
+import 'package:silance/features/messaging/data/repositories/socket_messaging_repository_impl.dart';
+import 'package:silance/features/messaging/domain/repositories/socket_messaging_repository.dart';
+import 'package:silance/features/messaging/presentation/cubit/messaging_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -26,4 +30,16 @@ void setupLocator() {
   getIt.registerFactory(() => RegisterCubit(getIt()));
   getIt.registerFactory<HomeRepo>(() => RemoteHomeRepo(getIt()));
   getIt.registerFactory(() => HomeCubit(getIt()));
+
+  //-----------/ Messaging /-----------//
+  getIt.registerFactory<SocketMessagingDatasource>(
+    () => SocketMessagingDatasourceImpl(),
+  );
+  getIt.registerFactory<SocketMessagingRepository>(
+    () => SocketMessagingRepositoryImpl(getIt()),
+  );
+  getIt.registerFactoryParam<MessagingCubit, String, String>(
+    (userId, targetId) =>
+        MessagingCubit(repo: getIt(), userId: userId, targetId: targetId),
+  );
 }
