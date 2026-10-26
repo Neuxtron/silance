@@ -25,12 +25,20 @@ class MessagingCubit({
   }
 
   Future<void> sendMessage(String content) async {
+    // Store message id
+    final messageId = DateTime.now().millisecondsSinceEpoch;
     final message = Message(
+      id: messageId,
       senderId: userId,
       receiverId: targetId,
       content: content,
     );
-    emit(state.copyWith(messages: [...state.messages, message]));
+    emit(
+      state.copyWith(
+        updateId: state.updateId + 1,
+        messages: [...state.messages, message],
+      ),
+    );
 
     final result = await repo.sendMessage(message);
     result.fold(
@@ -40,13 +48,27 @@ class MessagingCubit({
           errorMessage: () => failure.message,
         ),
       ),
-      (_) => emit(state.copyWith(status: .connected)),
+      (_) {
+        // Change the status of message with matching id to .sent
+        final messages = state.messages.map((message) {
+          if (message.id != messageId) return message;
+          return message.copyWith(status: .sent);
+        }).toList();
+        emit(
+          state.copyWith(
+            updateId: state.updateId + 1,
+            status: .connected,
+            messages: messages,
+          ),
+        );
+      },
     );
   }
 
   void _onMessage(Message message) {
     emit(
       state.copyWith(
+        updateId: state.updateId + 1,
         status: .connected,
         messages: [...state.messages, message],
       ),
