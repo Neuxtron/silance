@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:silance/core/error/exceptions.dart';
+import 'package:silance/core/utils/constants.dart';
 import 'package:silance/core/utils/remote_datasource_guard.dart';
 import 'package:silance/features/messaging/domain/entities/message.dart';
+import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 abstract class SocketMessagingDatasource {
-  Stream<Message> watchMessages(String userId, String targetId);
+  Stream<Message> watchMessages();
   void sendMessage(Message message);
   Future<void> disconnect();
 }
@@ -17,11 +20,15 @@ class SocketMessagingDatasourceImpl()
     implements SocketMessagingDatasource {
   WebSocketChannel? _channel;
   @override
-  Stream<Message> watchMessages(String userId, String targetId) async* {
+  Stream<Message> watchMessages() async* {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(AppConstants.tokenKey);
     final socketUrl = dotenv.env['SOCKET_URL'];
-    final roomId = _getRoomId([userId, targetId]);
-    final uri = Uri.parse('$socketUrl/messages/$roomId');
-    final channel = WebSocketChannel.connect(uri);
+    final uri = Uri.parse('$socketUrl/messages');
+    final channel = IOWebSocketChannel.connect(
+      uri,
+      headers: {'Authorization': 'Bearer $token'},
+    );
     _channel = channel;
 
     try {
@@ -48,10 +55,5 @@ class SocketMessagingDatasourceImpl()
   Future<void> disconnect() async {
     await _channel?.sink.close();
     _channel = null;
-  }
-
-  String _getRoomId(List<String> ids) {
-    ids.sort();
-    return ids.join('_');
   }
 }

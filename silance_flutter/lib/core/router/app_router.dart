@@ -37,14 +37,19 @@ class AppRouter {
       final loggedIn = authState is Authenticated;
       final authPages = [AppRoutes.login, AppRoutes.register];
       final onAuthPage = authPages.contains(loc);
+      final messagingCubit = getIt<MessagingCubit>();
 
       // Not logged in
       if (!loggedIn && !onAuthPage) {
+        messagingCubit.userId = null;
+        messagingCubit.disconnect();
         return AppRoutes.login;
       }
 
       // Logged in
       if (loggedIn && (onAuthPage || loc == AppRoutes.splash)) {
+        messagingCubit.userId = authState.user.id;
+        messagingCubit.startMessages();
         return AppRoutes.home;
       }
       return null;
@@ -107,15 +112,9 @@ class AppRouter {
       GoRoute(
         path: '${AppRoutes.messagingRoom}/:targetId',
         builder: (context, state) {
-          final userId = context.read<AuthCubit>().user!.id;
           final targetId = state.pathParameters['targetId'];
-          return BlocProvider(
-            create: (context) {
-              return getIt<MessagingCubit>(param1: userId, param2: targetId)
-                ..startMessages();
-            },
-            child: const MessagingRoomPage(),
-          );
+          context.read<MessagingCubit>().targetId = targetId;
+          return const MessagingRoomPage();
         },
       ),
     ],

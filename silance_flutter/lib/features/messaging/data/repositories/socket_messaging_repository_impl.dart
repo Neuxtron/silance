@@ -9,11 +9,8 @@ class const SocketMessagingRepositoryImpl(
   final SocketMessagingDatasource dataSource,
 ) with RepositoryGuard implements SocketMessagingRepository {
   @override
-  Stream<Either<Failure, Message>> watchMessages(
-    String userId,
-    String targetId,
-  ) async* {
-    yield* streamGuard(() => dataSource.watchMessages(userId, targetId));
+  Stream<Either<Failure, Message>> watchMessages() async* {
+    yield* streamGuard(() => dataSource.watchMessages());
   }
 
   @override

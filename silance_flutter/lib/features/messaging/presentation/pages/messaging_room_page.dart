@@ -14,6 +14,7 @@ class MessagingRoomPage extends StatefulWidget {
 
 class _MessagingRoomPageState extends State<MessagingRoomPage> {
   final _newMessageController = TextEditingController();
+  late final MessagingCubit _messagingCubit;
 
   void _sendMessage() async {
     final cubit = context.read<MessagingCubit>();
@@ -23,7 +24,14 @@ class _MessagingRoomPageState extends State<MessagingRoomPage> {
   }
 
   @override
+  void initState() {
+    _messagingCubit = context.read<MessagingCubit>();
+    super.initState();
+  }
+
+  @override
   void dispose() {
+    _messagingCubit.targetId = null;
     _newMessageController.dispose();
     super.dispose();
   }
@@ -41,7 +49,6 @@ class _MessagingRoomPageState extends State<MessagingRoomPage> {
                 // Get fresh messages every rebuild trigger
                 final messages = context
                     .read<MessagingCubit>()
-                    .state
                     .messages
                     .reversed
                     .toList();
@@ -146,11 +153,12 @@ class _MessageItem extends StatelessWidget {
                 color: isSender ? Colors.white : Colors.black,
               ),
             ),
-            Icon(
-              _icon,
-              size: 12,
-              color: Colors.white,
-            ),
+            if (isSender)
+              Icon(
+                _icon,
+                size: 12,
+                color: Colors.white,
+              ),
           ],
         ),
       ),

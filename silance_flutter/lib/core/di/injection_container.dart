@@ -25,21 +25,18 @@ void setupLocator() {
     () => RemoteAuthDatasourceImpl(getIt()),
   );
   getIt.registerLazySingleton<AuthRepo>(() => RemoteAuthRepo(getIt()));
-  getIt.registerLazySingleton(() => AuthCubit(getIt()));
+  getIt.registerLazySingleton(() => AuthCubit(getIt())..authenticate());
   getIt.registerFactory(() => LoginCubit(getIt()));
   getIt.registerFactory(() => RegisterCubit(getIt()));
   getIt.registerFactory<HomeRepo>(() => RemoteHomeRepo(getIt()));
   getIt.registerFactory(() => HomeCubit(getIt()));
 
   //-----------/ Messaging /-----------//
-  getIt.registerFactory<SocketMessagingDatasource>(
+  getIt.registerLazySingleton<SocketMessagingDatasource>(
     () => SocketMessagingDatasourceImpl(),
   );
-  getIt.registerFactory<SocketMessagingRepository>(
+  getIt.registerLazySingleton<SocketMessagingRepository>(
     () => SocketMessagingRepositoryImpl(getIt()),
   );
-  getIt.registerFactoryParam<MessagingCubit, String, String>(
-    (userId, targetId) =>
-        MessagingCubit(repo: getIt(), userId: userId, targetId: targetId),
-  );
+  getIt.registerLazySingleton(() => MessagingCubit(repo: getIt()));
 }
