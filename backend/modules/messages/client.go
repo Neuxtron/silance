@@ -1,8 +1,12 @@
 package messages
 
 import (
+	"encoding/json"
+	"log"
+	"silance/modules/messages/models"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -13,17 +17,15 @@ const (
 )
 
 type Client struct {
-	Hub  *Hub
-	Conn *websocket.Conn
-	Send chan []byte
+	UserId uuid.UUID
+	Hub    *Hub
+	Conn   *websocket.Conn
+	Send   chan []byte
 }
 
 func (c *Client) ReadPump() {
 	defer func() {
-		select {
-		case c.Hub.unregister <- c:
-		case <-c.Hub.done:
-		}
+		c.Hub.unregister <- c
 		c.Conn.Close()
 	}()
 
@@ -35,16 +37,21 @@ func (c *Client) ReadPump() {
 	})
 
 	for {
-		_, msg, err := c.Conn.ReadMessage()
+		_, bMsg, err := c.Conn.ReadMessage()
 		if err != nil {
 			break
 		}
-
-		select {
-		case c.Hub.broadcast <- Message{sender: c, data: msg}:
-		case <-c.Hub.done:
-			return
+		var dto models.MessageDto
+		if err := json.Unmarshal(bMsg, &dto); err != nil {
+			log.Printf("Failed to parse message: %s", err)
+			continue
 		}
+
+		msg := Message{
+			sender: c,
+			data:   dto,
+		}
+		c.Hub.broadcast <- msg
 	}
 }
 

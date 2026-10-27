@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"silance/helper"
+	"silance/middlewares"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -21,15 +22,15 @@ var upgrader = websocket.Upgrader{
 }
 
 type Controller struct {
-	server *Server
+	hub *Hub
 }
 
-func NewController(server *Server) *Controller {
-	return &Controller{server}
+func NewController(hub *Hub) *Controller {
+	return &Controller{hub}
 }
 
 func (c *Controller) WsHandler(ctx *gin.Context) {
-	room := ctx.Param("room")
+	userId, _ := middlewares.CurrentUser(ctx)
 
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
@@ -37,18 +38,14 @@ func (c *Controller) WsHandler(ctx *gin.Context) {
 		return
 	}
 
-	client := &Client{Conn: conn, Send: make(chan []byte, 256)}
-
-	for {
-		hub := c.server.GetRoom(room)
-		client.Hub = hub
-
-		select {
-		case hub.register <- client:
-			go client.ReadPump()
-			go client.WritePump()
-			return
-		case <-hub.done:
-		}
+	client := &Client{
+		UserId: userId,
+		Hub:    c.hub,
+		Conn:   conn,
+		Send:   make(chan []byte, 256),
 	}
+
+	c.hub.register <- client
+	go client.ReadPump()
+	go client.WritePump()
 }

@@ -1,12 +1,18 @@
 package messages
 
-import "github.com/gin-gonic/gin"
+import (
+	"silance/middlewares"
+
+	"github.com/gin-gonic/gin"
+)
 
 func InitiateRoutes(router *gin.RouterGroup) {
 	api := router.Group("/messages")
 
-	server := NewServer()
-	controller := NewController(server)
+	hub := NewHub()
+	go hub.Run()
 
-	api.GET("/:room", controller.WsHandler)
+	controller := NewController(hub)
+
+	api.GET("", middlewares.AuthMiddleware(), controller.WsHandler)
 }
