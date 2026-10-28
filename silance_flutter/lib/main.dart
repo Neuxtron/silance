@@ -5,6 +5,7 @@ import 'package:silance/core/di/injection_container.dart';
 import 'package:silance/core/router/app_router.dart';
 import 'package:silance/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:silance/features/messaging/presentation/cubit/messaging_cubit.dart';
+import 'package:silance/features/notifications/data/use_cases/init_notifications.dart';
 
 void main() async {
   // Environment
@@ -13,6 +14,7 @@ void main() async {
   // Depency Injection
   setupLocator();
   await getIt.allReady();
+  await getIt<InitNotifications>()();
 
   runApp(const SilanceApp());
 }

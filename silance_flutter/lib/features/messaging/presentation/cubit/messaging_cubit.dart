@@ -1,12 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:silance/core/utils/constants.dart';
 import 'package:silance/features/messaging/domain/entities/chat_room.dart';
 import 'package:silance/features/messaging/domain/entities/message.dart';
 import 'package:silance/features/messaging/domain/repositories/socket_messaging_repository.dart';
 import 'package:silance/features/messaging/presentation/cubit/messaging_state.dart';
+import 'package:silance/features/notifications/data/use_cases/show_notification.dart';
+import 'package:silance/features/notifications/data/utils/notification_channels.dart';
+import 'package:silance/features/notifications/domain/entities/app_notification.dart';
 import 'package:uuid/uuid.dart';
 
-class MessagingCubit({required final SocketMessagingRepository repo})
-    extends Cubit<MessagingState> {
+class MessagingCubit({
+  required final SocketMessagingRepository repo,
+  required final ShowNotification showNotification,
+}) extends Cubit<MessagingState> {
   this : super(const MessagingState());
 
   String? _userId;
@@ -28,10 +34,7 @@ class MessagingCubit({required final SocketMessagingRepository repo})
       return;
     }
     _roomId = _generateRoomId(targetId);
-    if (!state.rooms.any((room) => room.id == _roomId)) {
-      final room = ChatRoom(id: _roomId!, messages: []);
-      emit(state.copyWith(rooms: [...state.rooms, room]));
-    }
+    preloadRooms([targetId]);
   }
 
   Future<void> startMessages() async {
@@ -87,7 +90,26 @@ class MessagingCubit({required final SocketMessagingRepository repo})
     );
   }
 
+  void preloadRooms(List<String> targetIds) {
+    final rooms = [...state.rooms];
+    for (var id in targetIds) {
+      if (!state.rooms.any((room) => room.id == id)) {
+        final roomId = _generateRoomId(id);
+        final room = ChatRoom(id: roomId, messages: []);
+        rooms.add(room);
+      }
+    }
+    emit(state.copyWith(rooms: rooms));
+  }
+
   void _onMessage(Message message) {
+    final notification = AppNotification(
+      id: 1,
+      title: 'New Message',
+      body: message.content,
+      channel: channelById(AppConstants.notifChannels.incomingMessages),
+    );
+    showNotification(notification);
     emit(
       state.copyWith(
         updateId: state.updateId + 1,

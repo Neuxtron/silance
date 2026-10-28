@@ -16,6 +16,7 @@ import 'package:silance/features/home/presentation/pages/home_page.dart';
 import 'package:silance/features/home/presentation/pages/splash_screen.dart';
 import 'package:silance/features/messaging/presentation/cubit/messaging_cubit.dart';
 import 'package:silance/features/messaging/presentation/pages/messaging_room_page.dart';
+import 'package:silance/features/notifications/data/use_cases/request_notification_permission.dart';
 
 class AppRouter {
   const AppRouter._();
@@ -38,6 +39,7 @@ class AppRouter {
       final authPages = [AppRoutes.login, AppRoutes.register];
       final onAuthPage = authPages.contains(loc);
       final messagingCubit = getIt<MessagingCubit>();
+      final requestNotifPermission = getIt<RequestNotificationPermission>();
 
       // Not logged in
       if (!loggedIn && !onAuthPage) {
@@ -50,6 +52,7 @@ class AppRouter {
       if (loggedIn && (onAuthPage || loc == AppRoutes.splash)) {
         messagingCubit.userId = authState.user.id;
         messagingCubit.startMessages();
+        requestNotifPermission();
         return AppRoutes.home;
       }
       return null;

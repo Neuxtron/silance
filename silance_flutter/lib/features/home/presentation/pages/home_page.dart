@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:silance/core/router/app_routes.dart';
 import 'package:silance/features/home/presentation/cubit/home_cubit.dart';
 import 'package:silance/features/home/presentation/cubit/home_states.dart';
+import 'package:silance/features/messaging/presentation/cubit/messaging_cubit.dart';
 
 class HomePage extends StatelessWidget {
   const new({super.key});
@@ -39,6 +40,9 @@ class HomePage extends StatelessWidget {
     }
 
     final users = (cubit.state as HomeLoaded).users;
+    final ids = users.map((user) => user.id).toList();
+    context.read<MessagingCubit>().preloadRooms(ids);
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: .start,
