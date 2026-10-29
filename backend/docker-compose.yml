@@ -23,18 +23,5 @@ services:
       timeout: 3s
       retries: 10
 
-  caddy:
-    image: caddy:2
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-    env_file:
-      - .env
-
 volumes:
-  caddy_data:
   pg_data:

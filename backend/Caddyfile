@@ -1,3 +1,0 @@
-{$DEPLOY_DOMAIN} {
-  reverse_proxy api:8080
-}
