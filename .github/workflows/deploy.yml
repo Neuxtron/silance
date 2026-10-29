@@ -27,10 +27,10 @@ jobs:
           context: "backend"
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}-api:latest
-            ghcr.io/${{ github.repository }}-api:${{ github.sha }}
+            ghcr.io/neuxtron/silance-api:latest
+            ghcr.io/neuxtron/silance-api:${{ github.sha }}
 
-      - uses: applyboy/ssh-action@v1
+      - uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
