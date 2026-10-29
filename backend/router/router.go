@@ -12,8 +12,20 @@ import (
 )
 
 func Initialize() {
+	if helper.IsProd {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	router := gin.Default()
-	if !helper.IsProd {
+
+	if helper.IsProd {
+		router.Use(cors.New(cors.Config{
+			AllowMethods:  []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+			AllowHeaders:  []string{"Origin", "Content-Length", "Content-Type", "Accept", "Authorization"},
+			ExposeHeaders: []string{"Content-Length"},
+			MaxAge:        12 * time.Hour,
+			AllowOrigins:  []string{"https://silance.zuzuzu.my.id"},
+		}))
+	} else {
 		router.Use(cors.New(cors.Config{
 			AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 			AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Accept", "Authorization"},
