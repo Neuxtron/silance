@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:silance/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:silance/features/authentication/presentation/cubit/register_cubit.dart';
 import 'package:silance/features/authentication/presentation/cubit/register_state.dart';
+import 'package:silance/features/authentication/presentation/widgets/password_text_field.dart';
 
 class RegisterPage extends StatelessWidget {
   const new({super.key});
@@ -62,19 +63,13 @@ class RegisterPage extends StatelessWidget {
                 hintText: 'Username (Optional)',
               ),
             ),
-            TextField(
+            PasswordTextField(
               onChanged: cubit.passwordChanged,
-              obscureText: true,
-              decoration: const InputDecoration(
-                hintText: 'Password',
-              ),
+              hint: 'Password',
             ),
-            TextField(
+            PasswordTextField(
               onChanged: cubit.confirmPasswordChanged,
-              obscureText: true,
-              decoration: const InputDecoration(
-                hintText: 'Confirm Password',
-              ),
+              hint: 'Confirm Password',
             ),
             const SizedBox(height: 24),
             BlocSelector<RegisterCubit, RegisterState, bool>(

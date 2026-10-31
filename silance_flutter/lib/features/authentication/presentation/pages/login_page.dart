@@ -5,6 +5,7 @@ import 'package:silance/core/router/app_routes.dart';
 import 'package:silance/features/authentication/presentation/cubit/auth_cubit.dart';
 import 'package:silance/features/authentication/presentation/cubit/login_cubit.dart';
 import 'package:silance/features/authentication/presentation/cubit/login_state.dart';
+import 'package:silance/features/authentication/presentation/widgets/password_text_field.dart';
 
 class LoginPage extends StatelessWidget {
   const new({super.key});
@@ -51,13 +52,9 @@ class LoginPage extends StatelessWidget {
               ),
               onChanged: cubit.usernameChanged,
             ),
-            TextField(
-              obscureText: true,
-              keyboardType: .visiblePassword,
-              decoration: const InputDecoration(
-                hintText: 'Password',
-              ),
+            PasswordTextField(
               onChanged: cubit.passwordChanged,
+              hint: 'Password',
             ),
             const SizedBox(height: 36),
             BlocSelector<LoginCubit, LoginState, bool>(
