@@ -3,11 +3,12 @@ package users
 import (
 	"silance/modules/users/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
-	FindAll() ([]models.User, error)
+	FindHomeData(id uuid.UUID) ([]models.User, error)
 }
 
 type repository struct {
@@ -18,11 +19,11 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db}
 }
 
-// FindAll implements [Repository].
-func (r *repository) FindAll() ([]models.User, error) {
+// FindHomeData implements [Repository].
+func (r *repository) FindHomeData(id uuid.UUID) ([]models.User, error) {
 	var users []models.User
 
-	err := r.db.Find(&users).Error
+	err := r.db.Not(models.User{ID: id}).Find(&users).Error
 	if err != nil {
 		return []models.User{}, err
 	}

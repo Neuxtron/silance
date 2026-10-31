@@ -2,6 +2,7 @@ package users
 
 import (
 	"silance/common"
+	"silance/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,8 +15,9 @@ func NewController(service Service) *Controller {
 	return &Controller{service}
 }
 
-func (c *Controller) GetAllUsers(ctx *gin.Context) {
-	users, err := c.service.GetAll()
+func (c *Controller) GetHomeUsers(ctx *gin.Context) {
+	id, _ := middlewares.CurrentUser(ctx)
+	users, err := c.service.GetHomeUsers(id)
 	if err != nil {
 		common.NewInternalServerErrorResponse(ctx, nil)
 		return
