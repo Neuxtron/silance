@@ -6,6 +6,7 @@ class HomeInitial extends HomeState {}
 
 class HomeLoading extends HomeState {}
 
-class HomeLoaded(final List<HomeUser> users) extends HomeState {}
+class HomeLoaded(final List<HomeUser> users, [final String? errorMessage])
+    extends HomeState {}
 
 class HomeError(final String message) extends HomeState {}

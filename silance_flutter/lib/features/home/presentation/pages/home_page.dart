@@ -11,119 +11,139 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: .fromLTRB(24, 38, 0, 24),
-              child: Text(
-                'Messages',
-                style: TextStyle(
-                  fontSize: 36,
-                  color: Colors.white38,
-                  fontWeight: .bold,
+    return BlocListener<HomeCubit, HomeState>(
+      listener: (context, state) {
+        final message = (state as HomeLoaded).errorMessage!;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(message)));
+      },
+      child: Scaffold(
+        body: RefreshIndicator(
+          onRefresh: context.read<HomeCubit>().refresh,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: .fromLTRB(24, 38, 0, 24),
+                  child: Text(
+                    'Messages',
+                    style: TextStyle(
+                      fontSize: 36,
+                      color: Colors.white38,
+                      fontWeight: .bold,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          BlocBuilder<HomeCubit, HomeState>(
-            builder: (context, state) {
-              final cubit = context.read<HomeCubit>();
-              switch (state) {
-                //-----------/ Loading /-----------//
-                case HomeInitial() || HomeLoading():
-                  return const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
-                  );
+              BlocBuilder<HomeCubit, HomeState>(
+                builder: (context, state) {
+                  final cubit = context.read<HomeCubit>();
+                  switch (state) {
+                    //-----------/ Loading /-----------//
+                    case HomeInitial() || HomeLoading():
+                      return const SliverFillRemaining(
+                        child: Center(child: CircularProgressIndicator()),
+                      );
 
-                //-----------/ Error /-----------//
-                case HomeError(:final message):
-                  return SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: .center,
-                        children: [
-                          Text(message),
-                          TextButton(
-                            onPressed: cubit.getUsers,
-                            child: const Text('Retry'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-
-                //-----------/ Empty /-----------//
-                case HomeLoaded(:final users) when users.isEmpty:
-                  return const SliverFillRemaining(
-                    child: Center(
-                      child: Text(
-                        'No other users are available',
-                        style: TextStyle(
-                          fontStyle: .italic,
-                          color: Colors.white54,
-                        ),
-                      ),
-                    ),
-                  );
-
-                //-----------/ Loaded /-----------//
-                case HomeLoaded(:final users):
-                  final ids = users.map((user) => user.id).toList();
-                  context.read<MessagingCubit>().preloadRooms(ids);
-                  return SliverList.builder(
-                    // itemCount: users.length,
-                    itemCount: 32,
-                    itemBuilder: (context, index) {
-                      final user = users[0];
-                      return ListTile(
-                        onTap: () {
-                          context.push(
-                            '${AppRoutes.messagingRoom}/${user.id}',
-                          );
-                        },
-                        leading: const CircleAvatar(
-                          backgroundColor: Color(0xFF331B55),
-                          child: Icon(Icons.person),
-                        ),
-                        title: Text(user.displayName),
-                        subtitle: Text(
-                          // user.username ?? 'No username',
-                          index.toString(),
-                          style: TextStyle(
-                            color: user.username == null
-                                ? Colors.white24
-                                : null,
-                            fontStyle: user.username == null ? .italic : null,
+                    //-----------/ Error /-----------//
+                    case HomeError(:final message):
+                      return SliverFillRemaining(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: .center,
+                            children: [
+                              Text(message),
+                              TextButton(
+                                onPressed: cubit.refresh,
+                                child: const Text('Retry'),
+                              ),
+                            ],
                           ),
                         ),
                       );
-                    },
-                  );
 
-                default:
-                  return SliverToBoxAdapter(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: .center,
-                        children: [
-                          const Text(
-                            'Something went wrong, please try again',
+                    //-----------/ Empty /-----------//
+                    case HomeLoaded(:final users) when users.isEmpty:
+                      return SliverFillRemaining(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: .center,
+                            children: [
+                              const Text(
+                                'No other users are available',
+                                style: TextStyle(
+                                  fontStyle: .italic,
+                                  color: Colors.white54,
+                                ),
+                              ),
+                              // TODO remove
+                              TextButton(
+                                onPressed: cubit.refresh,
+                                child: const Text('Retry'),
+                              ),
+                            ],
                           ),
-                          TextButton(
-                            onPressed: cubit.getUsers,
-                            child: const Text('Retry'),
+                        ),
+                      );
+
+                    //-----------/ Loaded /-----------//
+                    case HomeLoaded(:final users):
+                      final ids = users.map((user) => user.id).toList();
+                      context.read<MessagingCubit>().preloadRooms(ids);
+                      return SliverList.builder(
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          final user = users[index];
+                          return ListTile(
+                            onTap: () {
+                              context.push(
+                                '${AppRoutes.messagingRoom}/${user.id}',
+                              );
+                            },
+                            leading: const CircleAvatar(
+                              backgroundColor: Color(0xFF331B55),
+                              child: Icon(Icons.person),
+                            ),
+                            title: Text(user.displayName),
+                            subtitle: Text(
+                              user.username ?? 'No username',
+                              style: TextStyle(
+                                color: user.username == null
+                                    ? Colors.white24
+                                    : null,
+                                fontStyle: user.username == null
+                                    ? .italic
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+
+                    default:
+                      return SliverToBoxAdapter(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: .center,
+                            children: [
+                              const Text(
+                                'Something went wrong, please try again',
+                              ),
+                              TextButton(
+                                onPressed: cubit.refresh,
+                                child: const Text('Retry'),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-              }
-            },
+                        ),
+                      );
+                  }
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

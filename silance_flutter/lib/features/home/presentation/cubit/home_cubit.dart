@@ -14,4 +14,14 @@ class HomeCubit(final HomeRepo repo) extends Cubit<HomeState> {
       (users) => emit(HomeLoaded(users)),
     );
   }
+
+  Future<void> refresh() async {
+    final currUsers = (state as HomeLoaded).users;
+    final result = await repo.getUsers();
+
+    result.fold(
+      (failure) => emit(HomeLoaded(currUsers, failure.message)),
+      (users) => emit(HomeLoaded(users)),
+    );
+  }
 }
