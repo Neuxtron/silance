@@ -11,33 +11,37 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.watch<HomeCubit>();
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: .start,
-        children: [
-          const Padding(
-            padding: .fromLTRB(24, 38, 0, 24),
-            child: Text(
-              'Messages',
-              style: TextStyle(
-                fontSize: 36,
-                color: Colors.white38,
-                fontWeight: .bold,
+      body: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: .fromLTRB(24, 38, 0, 24),
+              child: Text(
+                'Messages',
+                style: TextStyle(
+                  fontSize: 36,
+                  color: Colors.white38,
+                  fontWeight: .bold,
+                ),
               ),
             ),
           ),
-          Expanded(
-            child: Builder(
-              builder: (context) {
-                switch (cubit.state) {
-                  //-----------/ Loading /-----------//
-                  case HomeInitial() || HomeLoading():
-                    return const Center(child: CircularProgressIndicator());
+          BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, state) {
+              final cubit = context.read<HomeCubit>();
+              switch (state) {
+                //-----------/ Loading /-----------//
+                case HomeInitial() || HomeLoading():
+                  return const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
 
-                  //-----------/ Error /-----------//
-                  case HomeError(:final message):
-                    return Center(
+                //-----------/ Error /-----------//
+                case HomeError(:final message):
+                  return SliverFillRemaining(
+                    child: Center(
                       child: Column(
                         mainAxisAlignment: .center,
                         children: [
@@ -48,11 +52,13 @@ class HomePage extends StatelessWidget {
                           ),
                         ],
                       ),
-                    );
+                    ),
+                  );
 
-                  //-----------/ Empty /-----------//
-                  case HomeLoaded(:final users) when users.isEmpty:
-                    return const Center(
+                //-----------/ Empty /-----------//
+                case HomeLoaded(:final users) when users.isEmpty:
+                  return const SliverFillRemaining(
+                    child: Center(
                       child: Text(
                         'No other users are available',
                         style: TextStyle(
@@ -60,57 +66,62 @@ class HomePage extends StatelessWidget {
                           color: Colors.white54,
                         ),
                       ),
-                    );
+                    ),
+                  );
 
-                  //-----------/ Loaded /-----------//
-                  case HomeLoaded(:final users):
-                    final ids = users.map((user) => user.id).toList();
-                    context.read<MessagingCubit>().preloadRooms(ids);
-
-                    return ListView.builder(
-                      itemCount: users.length,
-                      itemBuilder: (context, index) {
-                        final user = users[index];
-                        return ListTile(
-                          onTap: () {
-                            context.push(
-                              '${AppRoutes.messagingRoom}/${user.id}',
-                            );
-                          },
-                          leading: const CircleAvatar(
-                            backgroundColor: Color(0xFF331B55),
-                            child: Icon(Icons.person),
+                //-----------/ Loaded /-----------//
+                case HomeLoaded(:final users):
+                  final ids = users.map((user) => user.id).toList();
+                  context.read<MessagingCubit>().preloadRooms(ids);
+                  return SliverList.builder(
+                    // itemCount: users.length,
+                    itemCount: 32,
+                    itemBuilder: (context, index) {
+                      final user = users[0];
+                      return ListTile(
+                        onTap: () {
+                          context.push(
+                            '${AppRoutes.messagingRoom}/${user.id}',
+                          );
+                        },
+                        leading: const CircleAvatar(
+                          backgroundColor: Color(0xFF331B55),
+                          child: Icon(Icons.person),
+                        ),
+                        title: Text(user.displayName),
+                        subtitle: Text(
+                          // user.username ?? 'No username',
+                          index.toString(),
+                          style: TextStyle(
+                            color: user.username == null
+                                ? Colors.white24
+                                : null,
+                            fontStyle: user.username == null ? .italic : null,
                           ),
-                          title: Text(user.displayName),
-                          subtitle: Text(
-                            user.username ?? 'No username',
-                            style: TextStyle(
-                              color: user.username == null
-                                  ? Colors.white24
-                                  : null,
-                              fontStyle: user.username == null ? .italic : null,
-                            ),
-                          ),
-                        );
-                      },
-                    );
+                        ),
+                      );
+                    },
+                  );
 
-                  default:
-                    return Center(
+                default:
+                  return SliverToBoxAdapter(
+                    child: Center(
                       child: Column(
                         mainAxisAlignment: .center,
                         children: [
-                          const Text('Something went wrong, please try again'),
+                          const Text(
+                            'Something went wrong, please try again',
+                          ),
                           TextButton(
                             onPressed: cubit.getUsers,
                             child: const Text('Retry'),
                           ),
                         ],
                       ),
-                    );
-                }
-              },
-            ),
+                    ),
+                  );
+              }
+            },
           ),
         ],
       ),
