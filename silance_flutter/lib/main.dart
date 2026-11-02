@@ -9,7 +9,14 @@ import 'package:silance/features/notifications/data/use_cases/init_notifications
 
 void main() async {
   // Environment
-  await dotenv.load(fileName: '.env');
+  await dotenv.load(
+    fileName: 'env/.env',
+    isOptional: true,
+    overrideWithFiles: [
+      'env/.env.local', //Highest priority
+      'env/.env.development',
+    ],
+  );
 
   // Depency Injection
   setupLocator();
