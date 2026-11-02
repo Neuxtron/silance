@@ -12,6 +12,10 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<HomeCubit, HomeState>(
+      listenWhen: (p, c) {
+        if (c is! HomeLoaded) return false;
+        return c.errorMessage != null;
+      },
       listener: (context, state) {
         final message = (state as HomeLoaded).errorMessage!;
         ScaffoldMessenger.of(context)
@@ -65,24 +69,14 @@ class HomePage extends StatelessWidget {
 
                     //-----------/ Empty /-----------//
                     case HomeLoaded(:final users) when users.isEmpty:
-                      return SliverFillRemaining(
+                      return const SliverFillRemaining(
                         child: Center(
-                          child: Column(
-                            mainAxisAlignment: .center,
-                            children: [
-                              const Text(
-                                'No other users are available',
-                                style: TextStyle(
-                                  fontStyle: .italic,
-                                  color: Colors.white54,
-                                ),
-                              ),
-                              // TODO remove
-                              TextButton(
-                                onPressed: cubit.refresh,
-                                child: const Text('Retry'),
-                              ),
-                            ],
+                          child: Text(
+                            'No other users are available',
+                            style: TextStyle(
+                              fontStyle: .italic,
+                              color: Colors.white54,
+                            ),
                           ),
                         ),
                       );
